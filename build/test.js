@@ -1,2 +1,6 @@
-export const sum = (a, b) => a + b;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sum = void 0;
+const sum = (a, b) => a - b;
+exports.sum = sum;
 //# sourceMappingURL=test.js.map
