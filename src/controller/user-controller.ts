@@ -1,49 +1,91 @@
 import { IUser } from '../model/user';
 import UserService from '../services/user-service';
-import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
 import { successResponse, validateUserData } from '../utils/helpers';
+import * as uuid from 'uuid';
 
-const service = new UserService();
+const userService = new UserService();
 
 export default class UsersControllerImpl {
   constructor() {}
   getUsers(req: IncomingMessage, res: ServerResponse) {
-    const data = service.getUsers();
+    const data = userService.getUsers();
     successResponse(res, 200, data);
   }
-  getUser(req: IncomingMessage, res: ServerResponse, id: string) {}
+  async getUser(req: IncomingMessage, res: ServerResponse, id: string) {
+    try {
+      if (!uuid.validate(id)) {
+        throw new RequestError('UserId is invalid', 400);
+      }
+      const user: IUser | undefined = await userService.find(id);
+
+      if (!user) throw new RequestError(`Record with id=${id} doesn't exist.`, 404);
+
+      successResponse(res, 200, user);
+    } catch (err) {
+      if (err instanceof RequestError) {
+        res.writeHead(err.code, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: err.message }));
+      }
+    }
+  }
+
+  async deleteUser(req: IncomingMessage, res: ServerResponse, id: string) {
+    try {
+      if (!uuid.validate(id)) {
+        throw new RequestError('UserId is invalid', 400);
+      }
+      const user: IUser | undefined = await userService.delete(id);
+
+      if (!user) throw new RequestError(`Record with id=${id} doesn't exist.`, 404);
+
+      successResponse(res, 200, user);
+    } catch (err) {
+      if (err instanceof RequestError) {
+        res.writeHead(err.code, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: err.message }));
+      }
+    }
+  }
 
   async createUser(req: IncomingMessage, res: ServerResponse) {
     try {
       const body: IUser = await bodyParser(req);
       await this.validateReqData(body);
-      const user = service.addUser(body);
+      const user = userService.add(body);
       successResponse(res, 201, user);
-    } catch {
-      throw new Error();
+    } catch (err) {
+      if (err instanceof Error) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: err.message }));
+      }
     }
   }
-  //   async createUser(req: IncomingMessage, res: ServerResponse) {
-  //     const data: IUser = await bodyParser(req);
-  //     successResponse(res, 201, data);
-  //     console.log(data);
-  //   }
 
   save() {}
   getAll() {
-    return service.getUsers();
+    return userService.getUsers();
   }
 
   async validateReqData(user: IUser) {
     if (!user.username.length) {
-      throw new Error('Body does not contain username');
+      throw new RequestError('Body does not contain username');
     }
     if (!user.age) {
-      throw new Error('Body does not contain username');
+      throw new RequestError('Body does not contain username');
     }
     if (!user.hobbies.length) {
-      throw new Error('Body does not contain username');
+      throw new RequestError('Body does not contain username');
     }
+  }
+}
+
+class RequestError extends Error {
+  code: number = 404;
+  constructor(message: string, code?: number) {
+    super(message);
+    this.name = 'RequestError';
+    this.code = code || 404;
   }
 }
 
@@ -62,8 +104,4 @@ function bodyParser(req: IncomingMessage): Promise<IUser> {
     });
     req.on('error', (err) => reject(err));
   });
-
-  //   return new Promise((resolve, reject) => {
-
-  //   });
 }

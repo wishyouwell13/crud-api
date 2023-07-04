@@ -7,7 +7,7 @@ export default class UserService {
   getUsers() {
     return users;
   }
-  addUser(user: IUser): IUser {
+  add(user: IUser): IUser {
     const id = uuid.v4().toString();
     const newUser: IUser = {
       id,
@@ -20,5 +20,22 @@ export default class UserService {
   updateUser(id: string) {
     // const user =
   }
-  deleteUser(id: string) {}
+
+  async delete(id: string) {
+    const targetUser: IUser | undefined = await this.find(id);
+    if (!targetUser) {
+      return;
+    }
+    for (let [idx, user] of users.entries()) {
+      if (user.id === targetUser.id) {
+        users.splice(idx, 1);
+        break;
+      }
+    }
+    return targetUser;
+  }
+
+  async find(id: string) {
+    return users.find((user) => user.id === id);
+  }
 }

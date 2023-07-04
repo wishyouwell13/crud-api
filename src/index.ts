@@ -15,9 +15,9 @@ const PORT = process.env.PORT || 4000;
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   try {
-    const { pathname } = url.parse(<string>req.url, true);
+    let path = req.url!.split('/');
 
-    switch (pathname) {
+    switch (`/${path[1]}/${path[2]}`) {
       case '/api/users':
         usersHandler(req, res);
         break;

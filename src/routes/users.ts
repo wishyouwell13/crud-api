@@ -24,8 +24,9 @@ export const usersHandler = async (req: IncomingMessage, res: ServerResponse) =>
     case 'GET':
       if (id.length) {
         controller.getUser(req, res, id);
+      } else {
+        controller.getUsers(req, res);
       }
-      controller.getUsers(req, res);
       //   successResponse(res, 200, data);
       break;
     case 'POST':
@@ -34,10 +35,14 @@ export const usersHandler = async (req: IncomingMessage, res: ServerResponse) =>
       await controller.createUser(req, res);
       //   successResponse(res, 200, data);
       break;
+
+    case 'DELETE':
+      if (id.length) {
+        controller.deleteUser(req, res, id);
+      }
+      break;
     default:
       successResponse(res, 400, []);
       break;
   }
-
-  console.log('yeah');
 };
