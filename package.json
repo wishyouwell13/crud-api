@@ -6,9 +6,10 @@
   "author": "Alexey Vlasov",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon",
-    "build": "tsc ./src/index.ts",
-    "start:prod": "npm run build && npm run start"
+    "start": "node build/index.js",
+    "start:dev": "nodemon",
+    "start:prod": "tsc && npm run start",
+    "clear": "rm -rf build"
   },
   "devDependencies": {
     "@types/node": "^20.3.3",
