@@ -1,7 +1,7 @@
 import { IUser } from '../model/user';
 import UserService from '../services/user-service';
 import { IncomingMessage, ServerResponse } from 'http';
-import { successResponse, validateUserData } from '../utils/helpers';
+import { generateResponse } from '../utils/helpers';
 import * as uuid from 'uuid';
 
 const userService = new UserService();
@@ -10,7 +10,7 @@ export default class UsersControllerImpl {
   constructor() {}
   getUsers(req: IncomingMessage, res: ServerResponse) {
     const data = userService.getUsers();
-    successResponse(res, 200, data);
+    generateResponse(res, 200, data);
   }
   async getUser(req: IncomingMessage, res: ServerResponse, id: string) {
     try {
@@ -21,11 +21,11 @@ export default class UsersControllerImpl {
 
       if (!user) throw new RequestError(`Record with id=${id} doesn't exist.`, 404);
 
-      successResponse(res, 200, user);
+      generateResponse(res, 200, user);
     } catch (err) {
       if (err instanceof RequestError) {
-        res.writeHead(err.code, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: err.message }));
+        const data = { message: err.message };
+        generateResponse(res, err.code, data);
       }
     }
   }
@@ -39,11 +39,11 @@ export default class UsersControllerImpl {
 
       if (!user) throw new RequestError(`Record with id=${id} doesn't exist.`, 404);
 
-      successResponse(res, 200, user);
+      generateResponse(res, 200, user);
     } catch (err) {
       if (err instanceof RequestError) {
-        res.writeHead(err.code, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: err.message }));
+        const data = { message: err.message };
+        generateResponse(res, err.code, data);
       }
     }
   }
@@ -53,11 +53,11 @@ export default class UsersControllerImpl {
       const body: IUser = await bodyParser(req);
       await this.validateReqData(body);
       const user = userService.add(body);
-      successResponse(res, 201, user);
+      generateResponse(res, 201, user);
     } catch (err) {
-      if (err instanceof Error) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: err.message }));
+      if (err instanceof RequestError) {
+        const data = { message: err.message };
+        generateResponse(res, err.code, data);
       }
     }
   }
