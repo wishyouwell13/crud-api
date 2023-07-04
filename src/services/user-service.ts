@@ -17,8 +17,18 @@ export default class UserService {
     users.push(newUser);
     return newUser;
   }
-  updateUser(id: string) {
-    // const user =
+  async update(id: string, data: IUser) {
+    const targetUser: IUser | undefined = await this.find(id);
+    if (!targetUser) {
+      return;
+    }
+    for (let [idx, user] of users.entries()) {
+      if (user.id === id) {
+        users[idx] = data;
+        break;
+      }
+    }
+    return data;
   }
 
   async delete(id: string) {

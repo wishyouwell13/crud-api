@@ -2,7 +2,7 @@ import UsersController from '../controller/user-controller';
 import { IncomingMessage, ServerResponse } from 'http';
 import UserService from '../services/user-service';
 
-import { successResponse } from '../utils/helpers';
+import { generateResponse } from '../utils/helpers';
 import { IUser } from '../model/user';
 
 const controller = new UsersController();
@@ -27,22 +27,21 @@ export const usersHandler = async (req: IncomingMessage, res: ServerResponse) =>
       } else {
         controller.getUsers(req, res);
       }
-      //   successResponse(res, 200, data);
+      //   generateResponse(res, 200, data);
       break;
     case 'POST':
-      console.log('pos');
-
       await controller.createUser(req, res);
-      //   successResponse(res, 200, data);
+      //   generateResponse(res, 200, data);
       break;
 
     case 'DELETE':
-      if (id.length) {
-        controller.deleteUser(req, res, id);
-      }
+      controller.deleteUser(req, res, id);
+      break;
+    case 'PUT':
+      controller.updateUser(req, res, id);
       break;
     default:
-      successResponse(res, 400, []);
+      generateResponse(res, 400, []);
       break;
   }
 };

@@ -1,17 +1,12 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { usersHandler } from './routes/users';
 import dotenv from 'dotenv';
-import url from 'url';
+// helpers
+import { generateResponse } from './utils/helpers';
 
-import { successResponse } from './utils/helpers';
 dotenv.config();
+
 const PORT = process.env.PORT || 4000;
-
-// const server = createServer((req: IncomingMessage, res: ServerResponse) => {
-//   console.log(req.method);
-
-//   successResponse(res, 200, []);
-// });
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   try {
@@ -22,17 +17,13 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
         usersHandler(req, res);
         break;
       default:
-        res.end('asd');
+        generateResponse(res, 404, { message: 'Requests to non-existing endpoint' });
         break;
     }
-  } catch (error) {
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(
-      JSON.stringify({
-        success: false,
-        error: error,
-      }),
-    );
+  } catch {
+    generateResponse(res, 500, {
+      message: 'Errors on the server side that occur during the processing of a request ',
+    });
   }
 });
 server.on('clientError', (err, socket) => {
