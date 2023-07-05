@@ -1,24 +1,15 @@
-import UsersController from '../controller/user-controller';
 import { IncomingMessage, ServerResponse } from 'http';
+import UsersController from '../controller/user-controller';
 import UserService from '../services/user-service';
 
 import { generateResponse } from '../utils/helpers';
-import { IUser } from '../model/user';
 
-const controller = new UsersController();
-const USERS_URL = '/api/users';
+const controller = new UsersController(new UserService());
 
 export const usersHandler = async (req: IncomingMessage, res: ServerResponse) => {
   const urlParts = req.url!.split('/');
-
   const id = urlParts[3] || '';
-
   const method = req.method;
-
-  //   let data: IUser[] = [];
-  let pathArray = req.url?.split('/');
-
-  const handlerPattern = `${method}: `;
 
   switch (method) {
     case 'GET':

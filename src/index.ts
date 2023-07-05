@@ -3,8 +3,10 @@ import { usersHandler } from './routes/users';
 import dotenv from 'dotenv';
 // helpers
 import { generateResponse } from './utils/helpers';
+import { availableParallelism } from 'os';
 
 dotenv.config();
+// console.log(availableParallelism());
 
 const PORT = process.env.PORT || 4000;
 

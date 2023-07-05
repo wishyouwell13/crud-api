@@ -1,51 +1,41 @@
-import { IUser } from '../model/user';
-import * as uuid from 'uuid';
-import { IncomingMessage } from 'http';
-const users: IUser[] = [];
+import User, { IUser } from '../model/user';
+
+const USERS: IUser[] = [];
 
 export default class UserService {
-  getUsers() {
-    return users;
-  }
-  add(user: IUser): IUser {
-    const id = uuid.v4().toString();
-    const newUser: IUser = {
-      id,
-      ...user,
-    };
+  public users: IUser[];
 
-    users.push(newUser);
+  constructor() {
+    this.users = USERS;
+  }
+  getUsers() {
+    return this.users;
+  }
+  add(data: IUser) {
+    const newUser = new User(data);
+
+    this.users.push(newUser);
     return newUser;
   }
   async update(id: string, data: IUser) {
     const targetUser: IUser | undefined = await this.find(id);
     if (!targetUser) {
-      return;
+      return undefined;
     }
-    for (let [idx, user] of users.entries()) {
-      if (user.id === id) {
-        users[idx] = data;
-        break;
-      }
-    }
+    this.users = this.users.map((user) => (user.id === id ? { ...user, ...data } : user));
     return data;
   }
 
-  async delete(id: string) {
-    const targetUser: IUser | undefined = await this.find(id);
+  async delete(_id: string) {
+    const targetUser: IUser | undefined = await this.find(_id);
     if (!targetUser) {
       return;
     }
-    for (let [idx, user] of users.entries()) {
-      if (user.id === targetUser.id) {
-        users.splice(idx, 1);
-        break;
-      }
-    }
+    this.users = this.users.filter(({ id }) => id !== _id);
     return targetUser;
   }
 
   async find(id: string) {
-    return users.find((user) => user.id === id);
+    return this.users.find((user) => user.id === id);
   }
 }

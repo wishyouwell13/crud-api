@@ -4,10 +4,10 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { generateResponse } from '../utils/helpers';
 import * as uuid from 'uuid';
 
-const userService = new UserService();
-
-export default class UsersControllerImpl {
-  constructor() {}
+export default class UsersController {
+  constructor(private userService: UserService) {
+    this.userService = userService;
+  }
   async updateUser(req: IncomingMessage, res: ServerResponse, id: string) {
     try {
       if (!uuid.validate(id)) {
@@ -16,7 +16,7 @@ export default class UsersControllerImpl {
       const body: IUser = await bodyParser(req);
 
       await this.validateReqData(body);
-      const user: IUser | undefined = await userService.update(id, body);
+      const user: IUser | undefined = await this.userService.update(id, body);
       if (!user) throw new RequestError(`Record with id=${id} doesn't exist.`, 404);
 
       generateResponse(res, 200, user);
@@ -28,7 +28,7 @@ export default class UsersControllerImpl {
     }
   }
   getUsers(req: IncomingMessage, res: ServerResponse) {
-    const data = userService.getUsers();
+    const data = this.userService.getUsers();
     generateResponse(res, 200, data);
   }
   async getUser(req: IncomingMessage, res: ServerResponse, id: string) {
@@ -36,7 +36,7 @@ export default class UsersControllerImpl {
       if (!uuid.validate(id)) {
         throw new RequestError('UserId is invalid', 400);
       }
-      const user: IUser | undefined = await userService.find(id);
+      const user: IUser | undefined = await this.userService.find(id);
 
       if (!user) throw new RequestError(`Record with id=${id} doesn't exist.`, 404);
 
@@ -54,7 +54,7 @@ export default class UsersControllerImpl {
       if (!uuid.validate(id)) {
         throw new RequestError('UserId is invalid', 400);
       }
-      const user: IUser | undefined = await userService.delete(id);
+      const user: IUser | undefined = await this.userService.delete(id);
 
       if (!user) throw new RequestError(`Record with id=${id} doesn't exist.`, 404);
 
@@ -71,7 +71,7 @@ export default class UsersControllerImpl {
     try {
       const body: IUser = await bodyParser(req);
       await this.validateReqData(body);
-      const user = userService.add(body);
+      const user = this.userService.add(body);
       generateResponse(res, 201, user);
     } catch (err) {
       if (err instanceof RequestError) {
@@ -81,7 +81,7 @@ export default class UsersControllerImpl {
     }
   }
   getAll() {
-    return userService.getUsers();
+    return this.userService.getUsers();
   }
 
   async validateReqData(user: IUser) {
