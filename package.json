@@ -1,0 +1,27 @@
+{
+  "name": "crud-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:wishyouwell13/crud-api.git",
+  "author": "Alexey Vlasov",
+  "license": "MIT",
+  "scripts": {
+    "start": "node build/index.js",
+    "start:dev": "nodemon",
+    "start:prod": "tsc && npm run start",
+    "clear": "rm -rf build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.3.3",
+    "@types/uuid": "^9.0.2",
+    "eslint": "^8.44.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.0"
+  }
+}
